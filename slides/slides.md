@@ -591,3 +591,5 @@ end
 ---
 
 # Obrigado
+
+## https://github.com/bamorim/palavriado
