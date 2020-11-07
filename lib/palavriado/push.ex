@@ -1,5 +1,18 @@
 defmodule Palavriado.Push do
   def run do
+    {counters, extractors} = start_processes()
+
+    stream_to_extractors(extractors)
+
+    for extractor <- extractors, do: Task.await(extractor, :infinity)
+    for counter <- counters, do: send(counter.pid, :done)
+
+    counters
+    |> Enum.map(&Task.await(&1, :infinity))
+    |> Enum.reduce(%{}, &Map.merge/2)
+  end
+
+  defp start_processes do
     schedulers = System.schedulers_online()
 
     counters = for _ <- 1..schedulers do
@@ -10,6 +23,10 @@ defmodule Palavriado.Push do
       Task.async(fn -> extractor(counters) end)
     end
 
+    {counters, extractors}
+  end
+
+  defp stream_to_extractors(extractors) do
     Palavriado.files()
     |> Stream.flat_map(&File.stream!(&1, [:utf8], :line))
     # Round robin on extractors
@@ -18,14 +35,7 @@ defmodule Palavriado.Push do
       send(extractor.pid, {:line, line})
     end)
     |> Stream.run()
-
     for extractor <- extractors, do: send(extractor.pid, :done)
-    for extractor <- extractors, do: Task.await(extractor, :infinity)
-    for counter <- counters, do: send(counter.pid, :done)
-
-    counters
-    |> Enum.map(&Task.await(&1, :infinity))
-    |> Enum.reduce(%{}, &Map.merge/2)
   end
 
   defp extractor(counters) do

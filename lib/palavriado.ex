@@ -5,9 +5,9 @@ defmodule Palavriado do
 
   alias Palavriado.Eager
   alias Palavriado.Lazy
-  alias Palavriado.Printer
   alias Palavriado.Push
   alias Palavriado.Pull
+  alias Palavriado.Flow
 
   @not_char_regex ~r/[^A-Za-z0-9À-ÖØ-öø-ÿ-]/
   @min_word_length 3
@@ -15,7 +15,7 @@ defmodule Palavriado do
   @files (
     @original_files
     |> Stream.cycle()
-    |> Enum.take(length(@original_files) * 1)
+    |> Enum.take(length(@original_files) * 10)
   )
 
   def benchmark do
@@ -24,22 +24,11 @@ defmodule Palavriado do
         "eager" => &Eager.run/0,
         "lazy" => &Lazy.run/0,
         "push" => &Push.run/0,
-        "pull" => &Pull.run/0
+        "pull" => &Pull.run/0,
+        "flow" => &Flow.run/0
       },
       time: 5
     )
-  end
-
-  def eager do
-    Eager.run() |> Printer.print()
-  end
-
-  def lazy do
-    Lazy.run() |> Printer.print()
-  end
-
-  def push do
-    Push.run() |> Printer.print()
   end
 
   def files, do: @files

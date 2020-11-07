@@ -1,4 +1,4 @@
-defmodule Extractor do
+defmodule Palavriado.Pull.Extractor do
   use GenStage
 
   def init(partitions) do
@@ -6,7 +6,7 @@ defmodule Extractor do
   end
 
   def handle_events(lines, _from, _state) do
-    lines = Enum.flat_map(lines, &Palavriado.extract_words/1)
-    {:noreply, lines, :ok}
+    words = Enum.flat_map(lines, &Palavriado.extract_words/1)
+    {:noreply, words, :ok}
   end
 end

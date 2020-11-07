@@ -22,7 +22,8 @@ defmodule Palavriado.MixProject do
   defp deps do
     [
       {:benchee, "~> 1.0", only: :dev},
-      {:gen_stage, "~> 1.0"}
+      {:gen_stage, "~> 1.0"},
+      {:flow, "~> 1.0"}
     ]
   end
 end
